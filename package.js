@@ -25,6 +25,7 @@ Package.onUse(function (api) {
     "ecmascript",
     "check",
     "mongo",
+    "ddp-rate-limiter",
   ];
 
   api.use(packages);
