@@ -209,16 +209,9 @@ import userAdminListQuery from '/imports/api/users/queries/userAdminList.js';
 const users = await userAdminListQuery.clone().fetchAsync();
 ```
 
-You can also use `fetchOne()` on the client as well, even supply a callback:
+You can also use `fetchOneAsync()` on the client as well:
 ```js
 const user = await userAdminListQuery.clone().fetchOneAsync();
-```
-
-You can use `fetchSync()` or `fetchOneSync()` to work with promises. 
-
-```js
-const users = await userAdminListQuery.clone().fetchSync();
-const user = await userAdminListQuery.clone().fetchOneSync();
 ```
 
 ## Counters
@@ -234,7 +227,7 @@ but if you need them, feel free to use them, we worked hard at making them as pe
 
 ## Behind the scenes
 
-When we are dealing with a static query (non-reactive), we make a call to the method that has been created when
+When fetching a query , we make a call to the method that has been created when
 we did `query.expose()`, params get checked, the firewall gets applied and returns the result from the query.
 
 The method and publication names we create are: `named_query_${queryName}`, and as argument they accept the `params` object.

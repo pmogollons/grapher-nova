@@ -15,7 +15,7 @@ createQuery({
 ```
 
 It abstracts your query into a graph composed of Collection Nodes and Field Nodes.
-it uses the **Link Manager** to construct this graph and if the fetching is done server-side (non-reactive queries),
+it uses the **Link Manager** to construct this graph and if the fetching is done server-side,
 it uses the **Bluelibs Nova package** the crown jewl of Grapher, which heavily minimizes requests to database.
 
 #### Exposure
