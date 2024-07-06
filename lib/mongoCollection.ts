@@ -1,6 +1,6 @@
 import { Mongo } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
-import { addLinks, addReducers, IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
+import { addLinks, addSchema, addReducers, IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
 // @ts-expect-error - We are extending the Mongo.Collection class
@@ -16,6 +16,8 @@ export class MongoCollection extends Mongo.Collection {
       this.addReducers = addReducersFunction;
       // @ts-expect-error - We are extending the Mongo.Collection class
       this.addLinks = addLinksFunction;
+      // @ts-expect-error - We are extending the Mongo.Collection class
+      this.addSchema = addSchemaFunction;
     }
   }
 }
@@ -77,3 +79,7 @@ export const addLinksFunction = function (links: Links) {
 
   return addLinks(this.raw, newLinks);
 };
+
+export const addSchemaFunction = function (schema: any) {
+  return addSchema(this.raw, schema);
+}
