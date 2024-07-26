@@ -1,16 +1,15 @@
-# Grapher 2.0 [(Using bluelibs nova)](https://www.bluelibs.com/docs/package-nova)
+# Nova | Grapher 2.0 
 
-_Grapher_ is a Data Fetching Layer on top of Meteor and MongoDB. It is production ready and battle tested.
+**NOVA** is a Data Fetching Layer on top of [bluelibs/nova](https://www.bluelibs.com/docs/package-nova), [Meteor](https://www.meteor.com/) and [MongoDB](https://www.mongodb.com/).
 
 How to install:
 ```bash
 mkdir packages
 cd packages
-git clone https://github.com/pmogollons/grapher.git
+git clone https://github.com/pmogollons/grapher-nova.git
 ```
 
 Companion packages
-* [grapher-react](https://github.com/pmogollons/grapher-react.git)
 * [grapher-react-native](https://github.com/pmogollons/grapher-react-native)
 
 ### Differences with the original Grapher:
@@ -23,75 +22,22 @@ Companion packages
 * No denormalization
 * No global or collection expose
 * No graphQL bridge
-* No support for $filters, $filter and $options in reducers and links body, use ```$: {}``` instead
+* No support for $filters, $filter and $options in reducers and links body, use ```$: { filters: {}, options:{} }``` instead
 * foreignIdentityField is now foreignField
 
 ### Changes and new features:
 * Firewalls and reducers are async
-* Filtered links (new)
-* Link aliasing (new)
-* New $ key for filters and options (new)
-* Support to hook into the mongodb pipeline for advanced queries (new)
-* Dynamic filters (new)
+* [Filtered links (new)](https://www.bluelibs.com/docs/package-nova/#filtered-links)
+* [Link aliasing (new)](https://www.bluelibs.com/docs/package-nova/#aliasing)
+*  [$ key for filters and options (new)](https://www.bluelibs.com/docs/package-nova/#querying)
+* [Support to hook into the mongodb pipeline for advanced queries (new)](https://www.bluelibs.com/docs/package-nova/#relational-filtering-and-sorting)
+* [Dynamic filters (new)](https://www.bluelibs.com/docs/package-nova/#dynamic-filters)
 * Reducers have extendable context with userId (new)
-* Support for transactions (new)
-* Support for high performance queries when setting collection schema (new)
+* Support for transactions (coming)
+* [Support for high performance queries when setting collection schema](https://www.bluelibs.com/docs/package-nova/#high-performance-queries)
 
 ## [Documentation](docs/index.md)
 
-This provides a learning curve for Grapher, and it explains all the features. If you want to visualize the documentation better, check it out here:
+This provides a learning curve for Nova, and it explains most basic the features. If you want to visualize the documentation better, check it out here:
 
-## [API](docs/api.md)
-
-Grapher cheatsheet, after you've learned it's powers this is the document will be very useful.
-
-### Quick Illustration
-
-Query:
-
-```js
-await createQuery({
-    posts: {
-        title: 1,
-        author: {
-            fullName: 1,
-        },
-        comments: {
-            text: 1,
-            createdAt: 1,
-            author: {
-                fullName: 1,
-            },
-        },
-        categories: {
-            name: 1,
-        },
-    },
-}).fetchAsync();
-```
-
-Result:
-
-```
-[
-    {
-        _id: 'postId',
-        title: 'Introducing Grapher',
-        author: {
-            _id: 'authorId',
-            fullName: 'John Smith
-        },
-        comments: [
-            {
-                _id: 'commentId',
-                text: 'Nice article!,
-                createdAt: Date,
-                author: {
-                    fullName: 1
-                }
-            }
-        ],
-        categories: [ {_id: 'categoryId', name: 'JavaScript'} ]
-    }
-]
-```
+## [API](https://www.bluelibs.com/docs/package-nova)
