@@ -18,13 +18,14 @@ const npmPackages = {
 Package.onUse(function (api) {
   Npm.depends(npmPackages);
 
-  api.versionsFrom(["2.3.1", "2.6.1", "2.7.3", "2.8.1", "2.9.1", "3.0-beta.4"]);
+  api.versionsFrom(["3.0"]);
 
   const packages = [
     "typescript",
     "ecmascript",
     "check",
     "mongo",
+    "zodern:types",
     "ddp-rate-limiter",
   ];
 
