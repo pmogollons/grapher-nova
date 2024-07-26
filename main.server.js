@@ -8,4 +8,4 @@ export { default as NamedQuery } from "./lib/namedQuery/namedQuery.server";
 export { default as NamedQueryStore } from "./lib/namedQuery/store";
 export { default as BaseResultCacher } from "./lib/namedQuery/cache/BaseResultCacher";
 export { default as MemoryResultCacher } from "./lib/namedQuery/cache/MemoryResultCacher";
-export { MongoCollection, addLinksFunction, addSchemaFunction, addReducersFunction } from "./lib/mongoCollection";
+export { Mongo, addLinksFunction, addSchemaFunction, addReducersFunction } from "./lib/mongoCollection";

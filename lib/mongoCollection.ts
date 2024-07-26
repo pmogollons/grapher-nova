@@ -1,10 +1,10 @@
-import { Mongo } from "meteor/mongo";
+import { Mongo as Mongo2 } from "meteor/mongo";
 import { Meteor } from "meteor/meteor";
 import { addLinks, addSchema, addReducers, IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
 // @ts-expect-error - We are extending the Mongo.Collection class
-export class MongoCollection extends Mongo.Collection {
+class Collection extends Mongo2.Collection {
   constructor(props: any) {
     super(props);
 
@@ -21,6 +21,10 @@ export class MongoCollection extends Mongo.Collection {
     }
   }
 }
+
+export const Mongo = {
+  Collection
+};
 
 /**
  * A wrapper for Nova addReducers function to use Meteor collections directly
