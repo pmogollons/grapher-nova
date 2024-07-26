@@ -3,7 +3,6 @@ import { Meteor } from "meteor/meteor";
 import { addLinks, addSchema, addReducers, IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
-// @ts-expect-error - We are extending the Mongo.Collection class
 class Collection extends Mongo2.Collection {
   constructor(props: any) {
     super(props);
