@@ -22,7 +22,6 @@ Companion packages
 * No denormalization
 * No global or collection expose
 * No graphQL bridge
-* No support for $filters, $filter and $options in reducers and links body, use ```$: { filters: {}, options:{} }``` instead
 * foreignIdentityField is now foreignField
 
 ### Changes and new features:
