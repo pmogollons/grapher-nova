@@ -3,14 +3,35 @@ import { Meteor } from 'meteor/meteor';
 import { DDP } from 'meteor/ddp';
 
 
+type AnyObject = Record<string, any>;
+type FirewallFunc = (userId: string, params: AnyObject) => Promise<void> | void;
+type EmbodyFunc = (body: AnyObject, params: AnyObject) => AnyObject;
+
+type ExposeParams = {
+  firewall?: FirewallFunc | FirewallFunc[];
+  method?: boolean;
+  unblock?: boolean;
+  validateParams?: any; // Function or Object
+  embody?: AnyObject | EmbodyFunc;
+}
+
+type ContextType = {
+  userId?: string;
+  session?: any; // Transaction mongo session
+  [key: string]: any;
+}
+
 interface Query {
-  setParams(): any
-  resolve(): any
-  expose(): any
-} // WIP
+  setParams(): void;
+  resolve(resolver: (params: AnyObject) => any): Promise<any> | any;
+  expose(params: ExposeParams): void;
+  clone(): Query;
+  fetchAsync(context?: ContextType): Promise<any[] | any>;
+  fetchOneAsync(context?: ContextType): Promise<AnyObject>;
+}
 
 type QueryOptions<T = any> = {
-  $filter?: any;
+  $filter?: any; // TODO: Improve
 }
 
 type DependencyGraph = {
@@ -25,6 +46,10 @@ type Body<T> = {
 export type UnionOmit<T, K extends keyof any> = T extends T
   ? Pick<T, Exclude<keyof T, K>>
   : never;
+
+declare module "meteor/pmogollons:nova" {
+  type createQuery = (name: string, func: () => void) => Query;
+}
 
 export namespace Mongo {
 
@@ -114,19 +139,19 @@ export namespace Mongo {
         inversedBy?: string;
         index?: boolean;
         filters?: any;
-    } }): void;
+      } }): void;
     addReducers(reducers: {
       [key: string]: {
         dependency: any,
         pipeline?: any[];
         projection?: any;
         reduce: any;
-    }}): void;
+      }}): void;
     createQuery(body: Body<T> | {}, options?: {}): Query;
     createQuery(name: string, body: Body<T> | {}, options?: {}): Query;
     attachSchema(schema: any): void;
-    extendWithDates(): void;
-    extendWithSoftDelete(): void;
+    attachSoftDelete(): void;
+    attachDatesSchema(): void;
 
     allow<Fn extends Transform<T> = undefined>(options: {
       insert?:
