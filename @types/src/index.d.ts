@@ -152,6 +152,8 @@ export namespace Mongo {
     attachSchema(schema: any): void;
     attachSoftDelete(): void;
     attachDatesSchema(): void;
+    aggregate(pipeline: any[], options: AnyObject): { toArray: Promise<any[]> };
+    aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
 
     allow<Fn extends Transform<T> = undefined>(options: {
       insert?:
