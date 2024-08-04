@@ -11,6 +11,7 @@ type ExposeParams = {
   firewall?: FirewallFunc | FirewallFunc[];
   method?: boolean;
   unblock?: boolean;
+  schema?: any; // TODO: Improve
   validateParams?: any; // Function or Object
   embody?: AnyObject | EmbodyFunc;
 }
@@ -152,7 +153,9 @@ export namespace Mongo {
     attachSchema(schema: any): void;
     attachSoftDelete(): void;
     attachDatesSchema(): void;
-    aggregate(pipeline: any[], options: AnyObject): { toArray: Promise<any[]> };
+    withSchema(schema: any): void;
+    withSoftDelete(): void;
+    withDates(): void;
     aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
 
     allow<Fn extends Transform<T> = undefined>(options: {
