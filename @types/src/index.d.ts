@@ -30,6 +30,8 @@ interface Query {
   clone(params: AnyObject): Query;
   fetchAsync(context?: ContextType): Promise<any[] | any>;
   fetchOneAsync(context?: ContextType): Promise<AnyObject>;
+  invalidateQueries(params?: AnyObject): void;
+  invalidateAllQueries(): void;
 }
 
 type QueryOptions<T = any> = {
