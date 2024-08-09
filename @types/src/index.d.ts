@@ -23,10 +23,11 @@ type ContextType = {
 }
 
 interface Query {
+  name: string;
   setParams(): void;
   resolve(resolver: (params: AnyObject) => any): Promise<any> | any;
   expose(params: ExposeParams): void;
-  clone(): Query;
+  clone(params: AnyObject): Query;
   fetchAsync(context?: ContextType): Promise<any[] | any>;
   fetchOneAsync(context?: ContextType): Promise<AnyObject>;
 }
