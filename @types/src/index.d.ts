@@ -24,10 +24,10 @@ type ContextType = {
 
 interface Query {
   name: string;
-  setParams(): void;
+  setParams(params?: AnyObject): void;
   resolve(resolver: (params: AnyObject) => any): Promise<any> | any;
   expose(params: ExposeParams): void;
-  clone(params: AnyObject): Query;
+  clone(params?: AnyObject): Query;
   fetchAsync(context?: ContextType): Promise<any[] | any>;
   fetchOneAsync(context?: ContextType): Promise<AnyObject>;
   invalidateQueries(params?: AnyObject): void;
@@ -44,6 +44,17 @@ type DependencyGraph = {
 
 type Body<T> = {
   [field: string]: DependencyGraph | Body<T> | QueryOptions<T>
+}
+
+type HookParams = {
+  doc: AnyObject;
+  previousDoc?: ContextType;
+  userId?: string;
+}
+
+type HookOptions = {
+  docFields?: AnyObject;
+  fetchPrevious?: boolean;
 }
 
 // Based on https://github.com/microsoft/TypeScript/issues/28791#issuecomment-443520161
@@ -160,6 +171,11 @@ export namespace Mongo {
     withSoftDelete(): void;
     withDates(): void;
     aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
+
+    onInsert(callback: (params: HookParams) => void, options?: HookOptions): void;
+    onUpdate(callback: (params: HookParams) => void, options?: HookOptions): void;
+    onRemove(callback: (params: HookParams) => void, options?: HookOptions): void;
+    onBeforeInsert(callback: (params: HookParams) => void): void;
 
     allow<Fn extends Transform<T> = undefined>(options: {
       insert?:
@@ -285,7 +301,7 @@ export namespace Mongo {
      * @param doc The document to insert. May not yet have an _id attribute, in which case Meteor will generate one for you.
      * @param callback If present, called with an error object as the first argument and, if no error, the _id as the second.
      */
-    insertAsync(doc: OptionalId<T>, callback?: Function): Promise<string>;
+    insertAsync(doc: OptionalId<T>, options?: { skipHooks?: boolean; }, callback?: Function): Promise<string>;
     /**
      * Returns the [`Collection`](http://mongodb.github.io/node-mongodb-native/3.0/api/Collection.html) object corresponding to this collection from the
      * [npm `mongodb` driver module](https://www.npmjs.com/package/mongodb) which is wrapped by `Mongo.Collection`.
@@ -314,6 +330,7 @@ export namespace Mongo {
      */
     removeAsync(
       selector: Selector<T> | ObjectID | string,
+      options?: { skipHooks?: boolean; },
       callback?: Function
     ): Promise<number>;
     /**
@@ -359,6 +376,7 @@ export namespace Mongo {
          * modify in an array field.
          */
         arrayFilters?: { [identifier: string]: any }[] | undefined;
+        skipHooks?: boolean;
       },
       callback?: Function
     ): Promise<number>;
