@@ -24,7 +24,7 @@ class Collection extends Mongo2.Collection {
 }
 
 export const Mongo = {
-  Collection
+  Collection,
 };
 
 /**
@@ -46,7 +46,7 @@ export const addReducersFunction = function (reducers: Reducers) {
     if (!(reducer.reduce?.({}) instanceof Promise)) {
       console.warn(
         `The reduce function of the reducer ${reducerKey} must be an async function`,
-        reducer.reduce?.constructor.name
+        reducer.reduce?.constructor.name,
       );
     }
   });
@@ -87,4 +87,4 @@ export const addLinksFunction = function (links: Links) {
 
 export const addSchemaFunction = function (schema: any) {
   return addSchema(this.raw, schema);
-}
+};
