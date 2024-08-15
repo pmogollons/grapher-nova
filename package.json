@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "**NOVA** is a Data Fetching Layer on top of [bluelibs/nova](https://www.bluelibs.com/docs/package-nova), [Meteor](https://www.meteor.com/) and [MongoDB](https://www.mongodb.com/).",
   "scripts": {
-    "publish": "meteor publish --create --release=3.0.2"
+    "publish": "meteor publish --release=3.0.2"
   },
   "author": "pmogollons",
   "license": "MIT",
