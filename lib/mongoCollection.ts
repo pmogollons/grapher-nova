@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { Mongo as Mongo2 } from "meteor/mongo";
-import { addLinks, addSchema, addReducers } from "@bluelibs/nova";
+import { addLinks, addReducers } from "@bluelibs/nova";
 import type { IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
@@ -83,8 +83,4 @@ export const addLinksFunction = function (links: Links) {
   });
 
   return addLinks(this.raw, newLinks);
-};
-
-export const addSchemaFunction = function (schema: any) {
-  return addSchema(this.raw, schema);
 };
