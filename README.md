@@ -4,9 +4,7 @@
 
 How to install:
 ```bash
-mkdir packages
-cd packages
-git clone https://github.com/pmogollons/grapher-nova.git
+meteor add pmogollons:nova
 ```
 
 Companion packages
@@ -32,8 +30,9 @@ Companion packages
 * [Support to hook into the mongodb pipeline for advanced queries (new)](https://www.bluelibs.com/docs/package-nova/#relational-filtering-and-sorting)
 * [Dynamic filters (new)](https://www.bluelibs.com/docs/package-nova/#dynamic-filters)
 * Reducers have extendable context with userId (new)
-* Support for transactions (coming)
+* Support for transactions
 * [Support for high performance queries when setting collection schema](https://www.bluelibs.com/docs/package-nova/#high-performance-queries)
+* cache option for exposures (new)
 
 ## [Documentation](docs/index.md)
 
