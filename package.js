@@ -1,18 +1,18 @@
-/* global Npm: true */
-/* global Package: true */
-
 Package.describe({
   name: "pmogollons:nova",
   version: "1.0.0",
   summary: "Grapher-like query layer on top of nova and meteor",
-  git: "https://github.com/cult-of-coders/grapher",
+  git: "https://github.com/pmogollons/grapher-nova",
   documentation: "README.md",
 });
 
 const npmPackages = {
-  "lodash": "4.17.21",
   "mongodb": "4.17.0",
   "@bluelibs/nova": "1.6.0",
+  "lodash.isobject": "3.0.2",
+  "lodash.isfunction": "3.0.9",
+  "lodash.clonedeep": "4.5.0",
+  "lodash.pick": "4.4.0",
 };
 
 Package.onUse(function (api) {
@@ -25,7 +25,7 @@ Package.onUse(function (api) {
     "ecmascript",
     "check",
     "mongo",
-    "zodern:types",
+    "zodern:types@1.0.13",
     "ddp-rate-limiter",
   ];
 
@@ -43,15 +43,13 @@ Package.onTest(function (api) {
     chai: "4.3.4",
   });
 
-  const packages = [
+  api.use([
     "random",
     "ecmascript",
     "typescript",
     "mongo",
-  ];
-
-  api.use(packages);
-  api.use("tracker");
+    "tracker",
+  ]);
 
   api.use(["meteortesting:mocha"]);
 });
