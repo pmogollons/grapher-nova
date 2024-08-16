@@ -17,8 +17,6 @@ class Collection extends Mongo2.Collection {
       this.addReducers = addReducersFunction;
       // @ts-expect-error - We are extending the Mongo.Collection class
       this.addLinks = addLinksFunction;
-      // @ts-expect-error - We are extending the Mongo.Collection class
-      this.addSchema = addSchemaFunction;
     }
   }
 }
