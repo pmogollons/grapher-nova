@@ -6,8 +6,8 @@ import pluginUnusedImports from "eslint-plugin-unused-imports";
 
 
 export default [
-  {files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"]},
-  {languageOptions: { globals: { ...globals.browser, ...global.node, ...globals.meteor } }},
+  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
+  { languageOptions: { globals: { ...globals.browser, ...globals.node, ...globals.meteor } } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
@@ -15,7 +15,7 @@ export default [
   {
     plugins: {
       "unused-imports": pluginUnusedImports,
-    }
+    },
   },
 
   {
@@ -116,5 +116,5 @@ export default [
       // ],
       "@typescript-eslint/no-explicit-any": "off",
     },
-  }
+  },
 ];
