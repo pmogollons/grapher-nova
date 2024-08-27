@@ -5,7 +5,7 @@ import type { IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
 const OriginalCollection = Mongo.Collection;
-// @ts-expect-error - We are extending the Mongo.Collection class
+
 class Collection extends OriginalCollection {
   constructor(props: any) {
     super(props);
