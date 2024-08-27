@@ -2,15 +2,17 @@
 
 **NOVA** is a Data Fetching Layer on top of [bluelibs/nova](https://www.bluelibs.com/docs/package-nova), [Meteor](https://www.meteor.com/) and [MongoDB](https://www.mongodb.com/).
 
-How to install:
+## How to install:
 ```bash
 meteor add pmogollons:nova
 ```
+### Important installation note
+To be able to use this package with Users collection, you need to make sure that it is the first package that is loaded in the project.
 
-Companion packages
+## Companion packages
 * [grapher-react-native](https://github.com/pmogollons/grapher-react-native)
 
-### Differences with the original Grapher:
+## Differences with the original Grapher:
 * No pub/sub (no reactivity), only methods
 * No meta links and meta filters
 * No linker engine (removed getLink, set, unset, add, remove, metadata)
@@ -22,7 +24,7 @@ Companion packages
 * No graphQL bridge
 * foreignIdentityField is now foreignField
 
-### Changes and new features:
+## Changes and new features:
 * Firewalls and reducers are async
 * [Filtered links (new)](https://www.bluelibs.com/docs/package-nova/#filtered-links)
 * [Link aliasing (new)](https://www.bluelibs.com/docs/package-nova/#aliasing)
