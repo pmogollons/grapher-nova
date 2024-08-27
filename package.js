@@ -39,16 +39,17 @@ Package.onTest(function (api) {
 
   Npm.depends({
     ...npmPackages,
-    chai: "4.3.4",
+    "react": "18.3.1",
   });
 
   api.use([
+    "mongo",
     "random",
+    "tinytest",
     "ecmascript",
     "typescript",
-    "mongo",
-    "tracker",
+    "accounts-password",
   ]);
 
-  api.use(["meteortesting:mocha"]);
+  api.mainModule("tests/index.js", "server");
 });
