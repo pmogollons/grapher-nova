@@ -79,12 +79,6 @@ declare module "meteor/mongo" {
         }}): void;
       createQuery(body: BodyT<T>, options?: AnyObject): IQuery;
       createQuery(name: string, body: BodyT<T>, options?: AnyObject): IQuery;
-      attachSchema(schema: any): void;
-      attachSoftDelete(): void;
-      attachDatesSchema(): void;
-      withSchema(schema: any): void;
-      withSoftDelete(): void;
-      withDates(): void;
       aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
     }
   }
