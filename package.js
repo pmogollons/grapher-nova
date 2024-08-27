@@ -7,7 +7,6 @@ Package.describe({
 });
 
 const npmPackages = {
-  "mongodb": "4.17.0",
   "@bluelibs/nova": "1.7.0",
   "lodash.isobject": "3.0.2",
   "lodash.isfunction": "3.0.9",
