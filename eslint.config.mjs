@@ -89,6 +89,9 @@ export default [
       "no-var": [
         "error",
       ],
+      "no-trailing-spaces": [
+        "error",
+      ],
       "react/prop-types": [
         0,
       ],
