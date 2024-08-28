@@ -73,7 +73,7 @@ Users.addReducers({
   },
 });
 
-Tinytest.addAsync("Users - posts and comments", async (test, done) => {
+Tinytest.addAsync("Links and reducers - posts and comments", async (test, done) => {
   await Users.removeAsync({});
   await Posts.removeAsync({});
   await Comments.removeAsync({});
@@ -109,7 +109,7 @@ Tinytest.addAsync("Users - posts and comments", async (test, done) => {
   done();
 });
 
-Tinytest.addAsync("Users - subscriptions", async (test, done) => {
+Tinytest.addAsync("Links and reducers - subscriptions", async (test, done) => {
   await Users.removeAsync({});
   await Subscriptions.removeAsync({});
 
@@ -134,7 +134,7 @@ Tinytest.addAsync("Users - subscriptions", async (test, done) => {
   done();
 });
 
-Tinytest.addAsync("Posts - author and comments", async (test, done) => {
+Tinytest.addAsync("Links and reducers - author and comments", async (test, done) => {
   await Users.removeAsync({});
   await Posts.removeAsync({});
   await Comments.removeAsync({});
@@ -167,7 +167,7 @@ Tinytest.addAsync("Posts - author and comments", async (test, done) => {
   done();
 });
 
-Tinytest.addAsync("Comments - post and author", async (test, done) => {
+Tinytest.addAsync("Links and reducers - post and author", async (test, done) => {
   await Users.removeAsync({});
   await Posts.removeAsync({});
   await Comments.removeAsync({});
