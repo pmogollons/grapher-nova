@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "lib": [ "es2019" ],
+    "baseUrl": ".",
+    "preserveSymlinks": true,
+    "paths": {
+      "meteor/*": [
+        "node_modules/@types/meteor/*",
+        ".meteor/local/types/packages.d.ts",
+      ]
+    }
+  }
+}
