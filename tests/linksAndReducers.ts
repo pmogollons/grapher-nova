@@ -1,12 +1,50 @@
-import { Meteor } from "meteor/meteor";
 import { Mongo } from "meteor/mongo";
+import { Meteor } from "meteor/meteor";
 import { Tinytest } from "meteor/tinytest";
 
 
+interface IUser {
+  _id: string;
+  username: string;
+}
+
+interface IComment {
+  _id: string;
+  content: string;
+  postId: string;
+  authorId: string;
+}
+
+interface ICommentExt extends IComment {
+  post: IPost;
+  author: IUser;
+}
+
+interface IPost {
+  _id: string;
+  title: string;
+  authorId: string;
+}
+
+interface IPostExt extends IPost {
+  comments: ICommentExt[];
+  author: IUser;
+}
+
+interface ISubscription {
+  _id: string;
+  name: string;
+  userId: string;
+}
+
+interface ISubscriptionExt extends ISubscription {
+  subscriber: IUser;
+}
+
 const Users = Meteor.users;
-const Posts = new Mongo.Collection("posts");
-const Comments = new Mongo.Collection("comments");
-const Subscriptions = new Mongo.Collection("subscriptions");
+const Posts = new Mongo.Collection<IPost, IPostExt>("posts");
+const Comments = new Mongo.Collection<IComment, ICommentExt>("comments");
+const Subscriptions = new Mongo.Collection<ISubscription, ISubscriptionExt>("subscriptions");
 
 Users.addLinks({
   subscriptions: {
@@ -48,6 +86,22 @@ Comments.addLinks({
   },
 });
 
+Posts.addReducers({
+  commentCount: {
+    dependency: {
+      comments: {
+        _id: true,
+      },
+    },
+    async reduce(post) {
+      const { comments = [] } = post;
+
+      return comments.length;
+    },
+  },
+});
+
+
 Users.addReducers({
   postCount: {
     dependency: {
@@ -67,7 +121,9 @@ Users.addReducers({
         },
       },
     },
-    async reduce({ posts = [] }) {
+    async reduce(user) {
+      const { posts = [] } = user;
+
       return posts.reduce((count, post) => count + (post.comments?.length || 0), 0);
     },
   },
@@ -114,8 +170,8 @@ Tinytest.addAsync("Links and reducers - subscriptions", async (test, done) => {
   await Subscriptions.removeAsync({});
 
   const userId = await Users.insertAsync({ username: "subscriber" });
-  const subId1 = await Subscriptions.insertAsync({ name: "Sub 1", userId });
-  const subId2 = await Subscriptions.insertAsync({ name: "Sub 2", userId });
+  await Subscriptions.insertAsync({ name: "Sub 1", userId });
+  await Subscriptions.insertAsync({ name: "Sub 2", userId });
 
   const user = await Users.createQuery({
     $filters: {
@@ -143,6 +199,7 @@ Tinytest.addAsync("Links and reducers - author and comments", async (test, done)
   const postId = await Posts.insertAsync({ title: "Test Post", authorId });
   await Comments.insertAsync({ content: "Comment 1", postId, authorId });
   await Comments.insertAsync({ content: "Comment 2", postId, authorId });
+  await Comments.updateAsync({ postId }, { $set: { content: "Comment 3", postId, authorId } });
 
   const post = await Posts.createQuery({
     $filters: {
@@ -161,9 +218,9 @@ Tinytest.addAsync("Links and reducers - author and comments", async (test, done)
   }).fetchOneAsync();
 
   test.equal(post.title, "Test Post", "Should fetch the correct post");
-  test.equal(post.author.username, "author", "Should fetch the correct author");
+  test.equal(post.author?.username, "author", "Should fetch the correct author");
   test.equal(post.comments.length, 2, "Post should have 2 comments");
-  test.equal(post.comments[0].author.username, "author", "Comment should have correct author");
+  test.equal(post.comments[0].author?.username, "author", "Comment should have correct author");
   done();
 });
 
