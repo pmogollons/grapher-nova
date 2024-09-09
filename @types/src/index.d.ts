@@ -19,41 +19,64 @@ type ContextType = {
   [key: string]: any;
 }
 
-interface IQuery {
+interface IQuery<T = any> {
   name: string;
   setParams(params?: AnyObject): void;
   resolve(resolver: (params: AnyObject) => any): Promise<any> | any;
   expose(params: ExposeParams): void;
-  clone(params?: AnyObject): IQuery;
-  fetchAsync(context?: ContextType): Promise<any[] | any>;
-  fetchOneAsync(context?: ContextType): Promise<AnyObject>;
+  clone(params?: AnyObject): IQuery<T>;
+  fetchAsync(context?: ContextType): Promise<T[]>;
+  fetchOneAsync(context?: ContextType): Promise<T>;
   invalidateQueries(params?: AnyObject): void;
   invalidateAllQueries(): void;
 }
 
-type DependencyGraph = {
-  [field: string]: DependencyGraph
+interface IResolverQuery<T = any> extends IQuery<T> {
+  fetchAsync(context?: ContextType): Promise<any>;
 }
+
+type DependencyGraph<T = any> = {
+  [field: string]: -1 | 1 | true | DependencyGraph<T>;
+}
+
+type $<T = any> = {
+  filters?: AnyObject;
+  options?: AnyObject;
+  pipeline?: any[];
+  [field: string]: $ | AnyObject | undefined;
+} | ((object: T) => {
+  filters?: AnyObject;
+  options?: AnyObject;
+  pipeline?: any[];
+});
 
 type FilterFunction = (params: FilterParams) => void;
 
 type QueryOptions<T = any> = {
+  $?: $<T>;
   $filter?: FilterFunction;
-  $filters?: DependencyGraph;
+  $filters?: AnyObject; // TODO: Improve
+  $search?: {
+    path?: string;
+    index: string;
+    isCompound?: boolean;
+  };
+  $paginate?: boolean;
 }
 
 type FilterParams = {
-  filters: AnyObject;
-  options: AnyObject;
-  params: AnyObject;
+  filters: AnyObject; // TODO: Improve
+  options: AnyObject; // TODO: Improve
+  params: AnyObject; // TODO: Improvee
 }
 
+// TODO: We need to improve Body to accept only fields that are in the schema
 type BodyT<T> = {
-  [field: string]: DependencyGraph | BodyT<T> | QueryOptions<T>;
-}
+  [field: string]: DependencyGraph | QueryOptions<T> | BodyT<T> | undefined;
+} | QueryOptions<T> | DependencyGraph;
 
 declare module "meteor/pmogollons:nova" {
-  type createQuery = (name: string, func: () => void) => IQuery;
+  type createQuery = (name: string, func: () => void) => IResolverQuery;
 }
 
 declare module "meteor/mongo" {
@@ -67,18 +90,18 @@ declare module "meteor/mongo" {
           unique?: boolean;
           many?: boolean;
           inversedBy?: string;
-          index?: boolean;
+          index?: 1 | -1 | true;
           filters?: any;
         } }): void;
       addReducers(reducers: {
         [key: string]: {
-          dependency: any,
+          dependency: DependencyGraph<T>,
           pipeline?: any[];
           projection?: any;
-          reduce: any;
+          reduce: (object: U, params: AnyObject) => Promise<any>;
         }}): void;
-      createQuery(body: BodyT<T>, options?: AnyObject): IQuery;
-      createQuery(name: string, body: BodyT<T>, options?: AnyObject): IQuery;
+      createQuery(body: BodyT<T>, options?: AnyObject): IQuery<U>;
+      createQuery(name: string, body: BodyT<T>, options?: AnyObject): IQuery<U>;
       aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
     }
   }
