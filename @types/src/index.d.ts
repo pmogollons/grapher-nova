@@ -58,8 +58,11 @@ type QueryOptions<T = any> = {
   $filters?: AnyObject; // TODO: Improve
   $search?: {
     path?: string;
-    index: string;
+    index: "text" | "$regex" | string;
+    language?: string;
     isCompound?: boolean;
+    caseSensitive?: boolean;
+    diacriticSensitive?: boolean;
   };
   $paginate?: boolean;
 }
