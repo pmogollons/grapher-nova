@@ -4,11 +4,21 @@ import { Tinytest } from "meteor/tinytest";
 
 const Contacts = new Mongo.Collection("contacts");
 
-const onBeforeEach = async () => {
+const onBeforeEach = async ({ softDelete = false } = {}) => {
+  const base = {};
+
+  if (softDelete) {
+    Contacts._softDelete = true;
+
+    base.isDeleted = false;
+  } else {
+    delete Contacts._softDelete;
+  }
+
   await Contacts.removeAsync({});
-  await Contacts.insertAsync({ name: "John Doe", age: 30 });
-  await Contacts.insertAsync({ name: "Jane Smith", age: 25 });
-  await Contacts.insertAsync({ name: "Bob Johnson", age: 35 });
+  await Contacts.insertAsync({ name: "John Doe", age: 30, ...base });
+  await Contacts.insertAsync({ name: "Jane Smith", age: 25, ...base });
+  await Contacts.insertAsync({ name: "Bob Johnson", age: 35, ...base });
 };
 
 Tinytest.addAsync("Collection Queries - paginate and filter function", async (test) => {
@@ -90,6 +100,36 @@ Tinytest.addAsync("Collection Queries - pagination", async (test) => {
   test.equal(count, 3);
 });
 
+Tinytest.addAsync("Collection Queries - softDelete", async (test) => {
+  await onBeforeEach({ softDelete: true });
+
+  // Mark one contact as deleted
+  await Contacts.updateAsync(
+    { name: "John Doe" },
+    { $set: { isDeleted: true } },
+  );
+
+  // Query should only return non-deleted contacts by default
+  const results = await Contacts.createQuery({
+    name: true,
+    isDeleted: true,
+  }).fetchAsync();
+
+  test.equal(results.length, 2);
+  test.include(results.map(r => r.name), "Jane Smith");
+  test.include(results.map(r => r.name), "Bob Johnson");
+
+  // Query with explicit isDeleted:true should return deleted contacts
+  const deletedResults = await Contacts.createQuery({
+    $filters: {
+      isDeleted: true,
+    },
+    name: true,
+  }).fetchAsync();
+
+  test.equal(deletedResults.length, 1);
+  test.equal(deletedResults[0].name, "John Doe");
+});
+
 // TODO: Test deep filter() on linked collections
-// TODO: Test softDelete query
 // TODO: Test $search. This requires an atlas mongodb instance with search indexes

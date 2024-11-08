@@ -4,6 +4,7 @@ import { addLinks, addReducers } from "@bluelibs/nova";
 import type { IReducerOption, ILinkCollectionOptions } from "@bluelibs/nova";
 
 
+Mongo.collections = Mongo.collections || {};
 const OriginalCollection = Mongo.Collection;
 
 class Collection extends OriginalCollection {
@@ -18,6 +19,8 @@ class Collection extends OriginalCollection {
       this.addReducers = addReducersFunction;
       // @ts-expect-error - We are extending the Mongo.Collection class
       this.addLinks = addLinksFunction;
+
+      Mongo.collections[this._name] = this;
     }
   }
 }

@@ -251,3 +251,58 @@ Tinytest.addAsync("Links and reducers - post and author", async (test, done) => 
   test.equal(comment.author.username, "commenter", "Should fetch the correct author");
   done();
 });
+
+Tinytest.addAsync("Links and reducers - with soft delete", async (test, done) => {
+  await Users.removeAsync({});
+  await Posts.removeAsync({});
+  await Comments.removeAsync({});
+
+  // Enable soft delete
+  Posts._softDelete = true;
+  Comments._softDelete = true;
+
+  const authorId = await Users.insertAsync({ username: "author" });
+  const postId = await Posts.insertAsync({
+    title: "Test Post",
+    authorId,
+    isDeleted: false,
+  });
+
+  await Comments.insertAsync({
+    content: "Active Comment",
+    postId,
+    authorId,
+    isDeleted: false,
+  });
+  await Comments.insertAsync({
+    content: "Deleted Comment",
+    postId,
+    authorId,
+    isDeleted: true,
+  });
+
+  const post = await Posts.createQuery({
+    $filters: {
+      _id: postId,
+    },
+    title: true,
+    comments: {
+      content: true,
+      author: {
+        username: true,
+      },
+    },
+  }).fetchOneAsync();
+
+  test.equal(post.title, "Test Post", "Should fetch the correct post");
+  test.equal(post.comments.length, 1, "Should only fetch non-deleted comments");
+  test.equal(post.comments[0].content, "Active Comment", "Should fetch the active comment");
+  test.equal(post.comments[0].author.username, "author", "Should fetch comment author");
+
+  // Clean up
+  delete Posts._softDelete;
+  delete Comments._softDelete;
+
+  done();
+});
+
