@@ -299,6 +299,33 @@ Tinytest.addAsync("Links and reducers - with soft delete", async (test, done) =>
   test.equal(post.comments[0].content, "Active Comment", "Should fetch the active comment");
   test.equal(post.comments[0].author.username, "author", "Should fetch comment author");
 
+  const post2 = await Posts.createQuery({
+    $filters: {
+      _id: postId,
+    },
+
+    _miaw: true,
+    title: true,
+    comments: {
+      $: {
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      },
+      content: true,
+      author: {
+        username: true,
+      },
+    },
+  }).fetchOneAsync();
+
+  test.equal(post2.title, "Test Post", "Should fetch the correct post");
+  test.equal(post2.comments.length, 1, "Should only fetch non-deleted comments");
+  test.equal(post2.comments[0].content, "Active Comment", "Should fetch the active comment");
+  test.equal(post2.comments[0].author.username, "author", "Should fetch comment author");
+
   // Clean up
   delete Posts._softDelete;
   delete Comments._softDelete;
