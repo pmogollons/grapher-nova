@@ -1,6 +1,6 @@
 {
   "name": "nova",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "**NOVA** is a Data Fetching Layer on top of [bluelibs/nova](https://www.bluelibs.com/docs/package-nova), [Meteor](https://www.meteor.com/) and [MongoDB](https://www.mongodb.com/).",
   "scripts": {
     "test": "meteor test-packages ./ --driver-package test-in-browser --port 3051 --open",
