@@ -65,6 +65,7 @@ type QueryOptions<T = any> = {
     diacriticSensitive?: boolean;
   };
   $paginate?: boolean;
+  $filtering?: boolean;
 }
 
 type FilterParams = {
