@@ -11,6 +11,10 @@ type ExposeParams = {
   schema?: any; // TODO: Improve
   validateParams?: any; // Function or Object
   embody?: AnyObject | EmbodyFunc;
+  cache?: {
+    ttl?: number;
+    type?: "list" | "single";
+  };
 }
 
 type ContextType = {
