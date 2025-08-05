@@ -7,7 +7,7 @@ Package.describe({
 });
 
 const npmPackages = {
-  "@bluelibs/nova": "1.8.1",
+  "@bluelibs/nova": "1.8.2",
   "lodash.isobject": "3.0.2",
   "lodash.isfunction": "3.0.9",
   "lodash.clonedeep": "4.5.0",
