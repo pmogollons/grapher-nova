@@ -12,7 +12,7 @@ class Collection extends OriginalCollection {
     super(props);
 
     // for @bluelibs/nova, we need to have only one instance of raw collection and use it everywhere
-    if (Meteor.isServer) {
+    if (Meteor.isServer && this._name) {
       // @ts-expect-error - We are extending the Mongo.Collection class
       this.raw = this.rawCollection();
       // @ts-expect-error - We are extending the Mongo.Collection class
