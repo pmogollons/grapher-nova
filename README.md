@@ -28,12 +28,12 @@ To be able to use this package with Users collection, you need to make sure that
 * Firewalls and reducers are async
 * [Filtered links (new)](https://www.bluelibs.com/docs/package-nova/#filtered-links)
 * [Link aliasing (new)](https://www.bluelibs.com/docs/package-nova/#aliasing)
-*  [$ key for filters and options (new)](https://www.bluelibs.com/docs/package-nova/#querying)
+* [$ key for filters and options (new)](https://www.bluelibs.com/docs/package-nova/#querying)
 * [Support to hook into the mongodb pipeline for advanced queries (new)](https://www.bluelibs.com/docs/package-nova/#relational-filtering-and-sorting)
 * [Dynamic filters (new)](https://www.bluelibs.com/docs/package-nova/#dynamic-filters)
 * Reducers have extendable context with userId (new)
 * Support for transactions (new)
-* cache option for exposures (new)
+* Cache option for exposures (new)
 
 ## [Documentation](docs/index.md)
 
