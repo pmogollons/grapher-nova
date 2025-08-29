@@ -34,6 +34,7 @@ To be able to use this package with Users collection, you need to make sure that
 * Reducers have extendable context with userId (new)
 * Support for transactions (new)
 * Cache option for exposures (new)
+* [Search with multiple modes (new)](docs/search.md)
 
 ## [Documentation](docs/index.md)
 

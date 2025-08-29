@@ -17,13 +17,8 @@ Collection.addLinks({
     linkName: {
         collection, // Mongo.Collection
         type, // 'one' or 'many'
-        metadata, // Boolean
         field, // String
         index, // Boolean, whether to index your collections
-        denormalize: {
-            field, // String
-            body, // Body from related collection
-        },
     },
 });
 
@@ -31,10 +26,6 @@ Collection.addLinks({
     linkName: {
         collection, // Mongo.Collection
         inversedBy, // The link name from the other side
-        denormalize: {
-            field, // String
-            body, // Body from related collection
-        },
     },
 });
 ```
@@ -134,8 +125,8 @@ query.cacheResults(
 ```js
 Collection.createQuery({
     $: {
-    filters: {},
-    options: {},
+        filters: {},
+        options: {},
     },
     $options, // Compatible, but not recommended. Mongo Options {sort, limit, skip}
     $filters, // Compatible, but not recommended. Mongo Filters

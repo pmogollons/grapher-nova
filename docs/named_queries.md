@@ -261,6 +261,8 @@ query.expose({
     // This deep extends your graph's body before processing it.
     // For example, you want a hidden $filter() functionality, or anything else.
     embody: {}, // Accepts Object or Function(body, params)
+
+    cache: {},
 })
 ```
 
