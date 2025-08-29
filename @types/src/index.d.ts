@@ -84,12 +84,12 @@ type BodyT<T> = {
 } | QueryOptions<T> | DependencyGraph;
 
 declare module "meteor/pmogollons:nova" {
-  type createQuery = (name: string, func: () => void) => IResolverQuery;
+  export function createQuery(name: string, func: () => void): IResolverQuery;
 }
 
 declare module "meteor/mongo" {
   namespace Mongo {
-    interface Collection<T, U = T> {
+    interface Collection<T = any, U = T> {
       addLinks(links: {
         [key: string] : {
           collection: any;
