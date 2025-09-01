@@ -1,6 +1,6 @@
 Package.describe({
   name: "pmogollons:nova",
-  version: "2.0.4",
+  version: "2.0.5",
   summary: "Grapher-like query layer on top of nova and meteor",
   git: "https://github.com/pmogollons/grapher-nova",
   documentation: "README.md",
