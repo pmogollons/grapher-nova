@@ -55,19 +55,27 @@ type $<T = any> = {
 });
 
 type FilterFunction = (params: FilterParams) => void;
+type SearchIndex = {
+  path?: string[];
+  index: string;
+  isCompound?: boolean;
+}
+type TextIndex = {
+  index: "$text";
+  language?: string;
+  caseSensitive?: boolean;
+  diacriticSensitive?: boolean;
+}
+type RegExIndex = {
+  index: "$regex";
+  path: string | string[];
+}
 
 type QueryOptions<T = any> = {
   $?: $<T>;
   $filter?: FilterFunction;
   $filters?: AnyObject; // TODO: Improve
-  $search?: {
-    path?: string;
-    index: "text" | "$regex" | string;
-    language?: string;
-    isCompound?: boolean;
-    caseSensitive?: boolean;
-    diacriticSensitive?: boolean;
-  };
+  $search?: SearchIndex | TextIndex | RegExIndex;
   $paginate?: boolean;
   $filtering?: boolean;
 }
