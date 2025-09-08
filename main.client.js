@@ -1,4 +1,3 @@
-import "./lib/extensions/createQuery";
+import "./lib/extensions/createQuery.client";
 
-export { createQuery } from "./lib/createQuery.js";
-export { default as withQuery } from "./lib/react/withQuery";
+export { createQueryClient as createQuery } from "./lib/createQuery.client";
