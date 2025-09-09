@@ -3,12 +3,18 @@
 type AnyObject = Record<string, any>;
 type FirewallFunc = (userId: string, params: AnyObject) => Promise<void> | void;
 type EmbodyFunc = (body: AnyObject, params: AnyObject) => AnyObject;
+type RateLimit = {
+  limit?: number;
+  time?: number;
+  message?: string;
+}
 
 type ExposeParams = {
   firewall?: FirewallFunc | FirewallFunc[];
   method?: boolean;
   unblock?: boolean;
   schema?: any; // TODO: Improve
+  rateLimit?: RateLimit;
   validateParams?: any; // Function or Object
   embody?: AnyObject | EmbodyFunc;
   cache?: {
