@@ -124,7 +124,7 @@ declare module "meteor/mongo" {
         }}): void;
       createQuery(body: BodyT<T>, options?: AnyObject): IQuery<U>;
       createQuery(name: string, body: BodyT<T>, options?: AnyObject): IQuery<U>;
-      aggregate(pipeline: any[], options: AnyObject): Promise<any[]>;
+      aggregate(pipeline: any[], options?: AnyObject): Promise<any[]>;
     }
   }
 }
