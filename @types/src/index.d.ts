@@ -1,8 +1,10 @@
 /* eslint no-unused-vars: 0 */
+import type * as m from 'meteor/mongo';
 
 type AnyObject = Record<string, any>;
 type FirewallFunc = (userId: string, params: AnyObject) => Promise<void> | void;
 type EmbodyFunc = (body: AnyObject, params: AnyObject) => AnyObject;
+
 type RateLimit = {
   limit?: number;
   time?: number;
@@ -45,19 +47,15 @@ interface IResolverQuery<T = any> extends IQuery<T> {
   fetchAsync(context?: ContextType): Promise<any>;
 }
 
-type DependencyGraph<T = any> = {
-  [field: string]: -1 | 1 | true | DependencyGraph<T>;
-}
-
 type $<T = any> = {
-  filters?: AnyObject;
-  options?: AnyObject;
-  pipeline?: any[];
+  filters?: m.Mongo.Selector<T>;
+  options?: m.Mongo.Options<T>;
+  pipeline?: any[]; // TODO: Improve
   [field: string]: $ | AnyObject | undefined;
 } | ((object: T) => {
-  filters?: AnyObject;
-  options?: AnyObject;
-  pipeline?: any[];
+  filters?: m.Mongo.Selector<T>;
+  options?: m.Mongo.Options<T>;
+  pipeline?: any[]; // TODO: Improve
 });
 
 type FilterFunction = (params: FilterParams) => void;
@@ -77,25 +75,29 @@ type RegExIndex = {
   path: string | string[];
 }
 
+type FilterParams<T = any> = {
+  filters: m.Mongo.Selector<T>;
+  options: m.Mongo.Options<T>;
+  params: AnyObject;
+}
+
 type QueryOptions<T = any> = {
   $?: $<T>;
   $filter?: FilterFunction;
-  $filters?: AnyObject; // TODO: Improve
+  $filters?: m.Mongo.Selector<T>;
+  $options?: m.Mongo.Options<T>;
   $search?: SearchIndex | TextIndex | RegExIndex;
   $paginate?: boolean;
   $filtering?: boolean;
 }
 
-type FilterParams = {
-  filters: AnyObject; // TODO: Improve
-  options: AnyObject; // TODO: Improve
-  params: AnyObject; // TODO: Improvee
-}
+type ProjectionValue = 1 | -1 | true;
 
-// TODO: We need to improve Body to accept only fields that are in the schema
-type BodyT<T> = {
-  [field: string]: DependencyGraph | QueryOptions<T> | BodyT<T> | undefined;
-} | QueryOptions<T> | DependencyGraph;
+type Projection<T> = {
+  [K in keyof T as K extends `$${string}` ? never : K]?: ProjectionValue | Projection<any>;
+};
+
+type BodyT<T> = QueryOptions<T> & Projection<T>;
 
 declare module "meteor/pmogollons:nova" {
   export function createQuery(name: string, func: () => void): IResolverQuery;
@@ -105,26 +107,28 @@ declare module "meteor/mongo" {
   namespace Mongo {
     interface Collection<T = any, U = T> {
       addLinks(links: {
-        [key: string] : {
+        [key: string]: {
           collection: any;
-          field?: string;
+          field?: keyof T;
           foreignField?: string;
           unique?: boolean;
           many?: boolean;
           inversedBy?: string;
           index?: 1 | -1 | true;
-          filters?: any;
-        } }): void;
+          filters?: m.Mongo.Selector<T>;
+        }
+      }): void;
       addReducers(reducers: {
         [key: string]: {
-          dependency: DependencyGraph<T>,
-          pipeline?: any[];
+          dependency: Projection<U>,
+          pipeline?: any[]; // TODO: Improve
           projection?: any;
           reduce: (object: U, params: AnyObject) => Promise<any>;
-        }}): void;
-      createQuery(body: BodyT<T>, options?: AnyObject): IQuery<U>;
-      createQuery(name: string, body: BodyT<T>, options?: AnyObject): IQuery<U>;
-      aggregate(pipeline: any[], options?: AnyObject): Promise<any[]>;
+        }
+      }): void;
+      createQuery(body: BodyT<U>, options?: AnyObject): IQuery<U>;
+      createQuery(name: string, body: BodyT<U>, options?: AnyObject): IQuery<U>;
+      aggregate(pipeline: any[], options: AnyObject): Promise<any[]>; // TODO: Improve pipeline and return type
     }
   }
 }
