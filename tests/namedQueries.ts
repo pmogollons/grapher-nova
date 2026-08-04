@@ -306,9 +306,11 @@ Tinytest.addAsync("Named Queries - Atlas Search with compound filters", async (t
   });
 
   const results = await userQuery.clone({ searchText: "developer", isActive: true }).fetchAsync();
+  const count = await userQuery.clone({ searchText: "developer", isActive: true }).getCountAsync();
 
   test.equal(results.length, 1);
   test.equal(results[0].username, "john_doe");
+  test.equal(count, 1);
 });
 
 Tinytest.addAsync("Named Queries - Complex filters and options", async (test) => {
