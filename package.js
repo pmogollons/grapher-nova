@@ -1,13 +1,13 @@
 Package.describe({
   name: "pmogollons:nova",
-  version: "2.0.6",
+  version: "2.0.7",
   summary: "Grapher-like query layer on top of nova and meteor",
   git: "https://github.com/pmogollons/grapher-nova",
   documentation: "README.md",
 });
 
 const npmPackages = {
-  "@bluelibs/nova": "1.8.2",
+  "@bluelibs/nova": "1.9.0",
   "lodash.isobject": "3.0.2",
   "lodash.isfunction": "3.0.9",
   "lodash.clonedeep": "4.5.0",
