@@ -3,8 +3,6 @@ import { Tinytest } from "meteor/tinytest";
 import { Users, Posts, Comments } from "./setup";
 
 
-
-
 Tinytest.addAsync("Links and reducers - posts and comments", async (test, done) => {
   await Users.removeAsync({});
   await Posts.removeAsync({});
@@ -25,8 +23,10 @@ Tinytest.addAsync("Links and reducers - posts and comments", async (test, done) 
 
     username: true,
     posts: {
+      $options: { readPreference: "secondaryPreferred" },
       title: true,
       comments: {
+        $options: { readPreference: "secondaryPreferred" },
         content: true,
       },
     },

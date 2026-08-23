@@ -49,12 +49,12 @@ interface IResolverQuery<T = any> extends IQuery<T> {
 
 type $<T = any> = {
   filters?: m.Mongo.Selector<T>;
-  options?: m.Mongo.Options<T>;
+  options?: m.Mongo.Options<T> & { readPreference?: "secondaryPreferred" };
   pipeline?: any[]; // TODO: Improve
   [field: string]: $ | AnyObject | undefined;
 } | ((object: T) => {
   filters?: m.Mongo.Selector<T>;
-  options?: m.Mongo.Options<T>;
+  options?: m.Mongo.Options<T> & { readPreference?: "secondaryPreferred" };
   pipeline?: any[]; // TODO: Improve
 });
 
@@ -77,7 +77,7 @@ type RegExIndex = {
 
 type FilterParams<T = any> = {
   filters: m.Mongo.Selector<T>;
-  options: m.Mongo.Options<T>;
+  options: m.Mongo.Options<T> & { readPreference?: "secondaryPreferred" };
   params: AnyObject;
 }
 
@@ -85,16 +85,19 @@ type QueryOptions<T = any> = {
   $?: $<T>;
   $filter?: FilterFunction;
   $filters?: m.Mongo.Selector<T>;
-  $options?: m.Mongo.Options<T>;
+  $options?: m.Mongo.Options<T> & { readPreference?: "secondaryPreferred" };
   $search?: SearchIndex | TextIndex | RegExIndex;
   $paginate?: boolean;
   $filtering?: boolean;
 }
 
 type ProjectionValue = 1 | -1 | true;
+// Links may expose fields and reducers outside the persisted document shape,
+// while their Nova query options should remain type-checked.
+type AnyLinkProjection = QueryOptions<any> & Record<string, unknown>;
 
 type Projection<T> = {
-  [K in keyof T as K extends `$${string}` ? never : K]?: ProjectionValue | Projection<any>;
+  [K in keyof T as K extends `$${string}` ? never : K]?: ProjectionValue | AnyLinkProjection;
 };
 
 type BodyT<T> = QueryOptions<T> & Projection<T>;
