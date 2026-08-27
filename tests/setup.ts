@@ -102,6 +102,14 @@ Posts.addReducers({
 
 
 Users.addReducers({
+  contextUserId: {
+    dependency: {
+      _id: true,
+    },
+    async reduce(_user, { context } = {}) {
+      return context?.userId;
+    },
+  },
   postCount: {
     dependency: {
       posts: {

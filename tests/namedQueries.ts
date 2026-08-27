@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { Tinytest } from "meteor/tinytest";
+import { MemoryResultCacher } from "meteor/pmogollons:nova";
 
 import { Users, Posts } from "./setup";
 
@@ -99,6 +100,43 @@ Tinytest.addAsync("Named Queries - Basic functionality with $filters", async (te
   test.equal(results.length, 2);
   test.equal(results[0].username, "jane_smith"); // Most recent first
   test.equal(results[1].username, "john_doe");
+});
+
+Tinytest.addAsync("Named Queries - Cached fetch forwards context", async (test) => {
+  await onBeforeEach();
+
+  const userQuery = Users.createQuery("getUsersWithContext", {
+    username: true,
+    contextUserId: true,
+  });
+  userQuery.cacheResults(new MemoryResultCacher());
+
+  const results = await userQuery.fetchAsync({ userId: "context-user" });
+
+  test.equal(results.length, 3);
+  results.forEach((user) => {
+    test.equal(user.contextUserId, "context-user");
+  });
+});
+
+Tinytest.addAsync("Named Queries - Cached count returns a number", async (test) => {
+  await onBeforeEach();
+
+  const userQuery = Users.createQuery("countActiveUsersWithCache", {
+    $filters: {
+      isActive: true,
+    },
+    username: true,
+  });
+  userQuery.cacheResults(new MemoryResultCacher());
+
+  const firstCount = await userQuery.getCountAsync();
+  const cachedCount = await userQuery.getCountAsync();
+
+  test.equal(firstCount, 2);
+  test.equal(cachedCount, 2);
+  test.equal(typeof firstCount, "number");
+  test.equal(typeof cachedCount, "number");
 });
 
 Tinytest.addAsync("Named Queries - Basic functionality with $filter function", async (test) => {
@@ -306,11 +344,23 @@ Tinytest.addAsync("Named Queries - Atlas Search with compound filters", async (t
   });
 
   const results = await userQuery.clone({ searchText: "developer", isActive: true }).fetchAsync();
-  const count = await userQuery.clone({ searchText: "developer", isActive: true }).getCountAsync();
+  userQuery.cacheResults(new MemoryResultCacher());
+
+  const cachedQuery = userQuery.clone({ searchText: "developer", isActive: true });
+  const count = await cachedQuery.getCountAsync();
+  const cachedCount = await cachedQuery.getCountAsync();
+
+  const emptyCachedQuery = userQuery.clone({ searchText: "nonexistent", isActive: true });
+  const emptyCount = await emptyCachedQuery.getCountAsync();
+  const cachedEmptyCount = await emptyCachedQuery.getCountAsync();
 
   test.equal(results.length, 1);
   test.equal(results[0].username, "john_doe");
   test.equal(count, 1);
+  test.equal(cachedCount, 1);
+  test.equal(typeof count, "number");
+  test.equal(emptyCount, 0);
+  test.equal(cachedEmptyCount, 0);
 });
 
 Tinytest.addAsync("Named Queries - Complex filters and options", async (test) => {
