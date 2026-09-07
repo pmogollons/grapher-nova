@@ -323,6 +323,42 @@ Tinytest.addAsync("Named Queries - Atlas Search with explicit path", async (test
   test.include(results.map(r => r.username), "bob_wilson");
 });
 
+for (const isCompound of [false, true]) {
+  Tinytest.addAsync(`Named Queries - Atlas Search sorting (${isCompound ? "compound" : "text"})`, async (test) => {
+    await onBeforeEach();
+    await Meteor.sleep(1000); // Wait for the index to be ready
+
+    for (const direction of [1, -1] as const) {
+      const userQuery = Users.createQuery(`searchUsersAtlasSort_${isCompound}_${direction}`, {
+        $search: {
+          index: isCompound ? "usersV2" : "users",
+          path: "tags",
+          isCompound,
+          sort: { createdAt: direction },
+        },
+        $options: {
+          // Atlas Search sorting must take precedence over regular query sorting.
+          sort: { createdAt: direction === 1 ? -1 : 1 },
+        },
+        $paginate: true,
+        username: true,
+        createdAt: true,
+      });
+
+      const expectedUsernames = direction === 1
+        ? ["john_doe", "bob_wilson"]
+        : ["bob_wilson", "john_doe"];
+      const results = await userQuery.clone({ searchText: "developer" }).fetchAsync();
+
+      test.equal(results.map(r => r.username), expectedUsernames);
+
+      const page = await userQuery.clone({ searchText: "developer", limit: 1, skip: 1 }).fetchAsync();
+
+      test.equal(page.map(r => r.username), expectedUsernames.slice(1));
+    }
+  });
+}
+
 Tinytest.addAsync("Named Queries - Atlas Search with compound filters", async (test) => {
   await onBeforeEach();
   await Meteor.sleep(1000); // Wait for the index to be ready

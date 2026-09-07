@@ -63,6 +63,8 @@ type SearchIndex = {
   path?: string[];
   index: string;
   isCompound?: boolean;
+  /** Sort by indexed fields or use searchScore to sort by relevance. */
+  sort?: Record<string, 1 | -1>;
 }
 type TextIndex = {
   index: "$text";
