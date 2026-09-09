@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "package-types/mongo": ["fixtures/mongo.d.ts"],
+      "package-types/pmogollons_nova": ["../../@types/src/index.d.ts"]
+    }
+  },
+  "files": ["fixtures/packages.d.ts", "projection.test.ts"]
+}

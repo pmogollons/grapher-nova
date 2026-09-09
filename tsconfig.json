@@ -9,5 +9,6 @@
         ".meteor/local/types/packages.d.ts",
       ]
     }
-  }
+  },
+  "exclude": ["node_modules", "tests/types"]
 }

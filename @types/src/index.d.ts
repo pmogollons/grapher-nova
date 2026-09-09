@@ -1,5 +1,5 @@
 /* eslint no-unused-vars: 0 */
-import type * as m from 'meteor/mongo';
+import type * as m from "meteor/mongo";
 
 type AnyObject = Record<string, any>;
 type FirewallFunc = (userId: string, params: AnyObject) => Promise<void> | void;
@@ -31,19 +31,21 @@ type ContextType = {
   [key: string]: any;
 }
 
-interface IQuery<T = any> {
+export interface IQuery<T = any, R = T> {
   name: string;
   setParams(params?: AnyObject): void;
   resolve(resolver: (params: AnyObject) => any): Promise<any> | any;
   expose(params: ExposeParams): void;
-  clone(params?: AnyObject): IQuery<T>;
-  fetchAsync(context?: ContextType): Promise<T[]>;
-  fetchOneAsync(context?: ContextType): Promise<T>;
+  clone(params?: AnyObject): IQuery<T, R>;
+  fetchAsync(context?: ContextType): Promise<R[]>;
+  // Kept non-optional for compatibility; an empty query returns undefined at runtime.
+  fetchOneAsync(context?: ContextType): Promise<R>;
   invalidateQueries(params?: AnyObject): void;
   invalidateAllQueries(): void;
 }
 
-interface IResolverQuery<T = any> extends IQuery<T> {
+interface IResolverQuery<T = any> extends IQuery<T, any> {
+  clone(params?: AnyObject): IResolverQuery<T>;
   fetchAsync(context?: ContextType): Promise<any>;
 }
 
@@ -98,15 +100,56 @@ type ProjectionValue = 1 | -1 | true;
 // while their Nova query options should remain type-checked.
 type AnyLinkProjection = QueryOptions<any> & Record<string, unknown>;
 
-type Projection<T> = {
-  [K in keyof T as K extends `$${string}` ? never : K]?: ProjectionValue | AnyLinkProjection;
-};
+// `any` permits reusable interface-typed bodies without an index signature.
+// It does not affect result inference: undeclared selected keys become unknown.
+type Projection<T> = 0 extends (1 & T)
+  ? AnyObject
+  : {
+      [K in keyof T as K extends `$${string}` ? never : K]?: ProjectionValue | AnyLinkProjection;
+    } & AnyObject;
 
 type BodyT<T> = QueryOptions<T> & Projection<T>;
 
-declare module "meteor/pmogollons:nova" {
-  export function createQuery(name: string, func: () => void): IResolverQuery;
-}
+type SelectedKeys<B> = Exclude<keyof B, `$${string}`>;
+type Simplify<T> = { [K in keyof T]: T[K] };
+type RequiredIdentifier<T> = { [K in keyof T]-?: Exclude<T[K], undefined> };
+type RootIdentifier<T> = "_id" extends keyof T
+  ? RequiredIdentifier<Pick<T, "_id">>
+  : { _id: unknown };
+
+// Mapping over Pick preserves the document's optional and readonly modifiers,
+// rather than inheriting modifiers from the query body.
+type ProjectKnownFields<T, B> = {
+  [K in keyof T]: K extends keyof B ? ProjectField<T[K], B[K]> : never;
+};
+
+type ProjectFields<T, B> = T extends unknown
+  ? Simplify<ProjectKnownFields<Pick<T, Extract<SelectedKeys<B>, keyof T>>, B> & {
+      [K in Exclude<SelectedKeys<B>, keyof T>]: unknown;
+    }>
+  : never;
+
+type ProjectField<T, B> = 0 extends (1 & T) ? any
+  : B extends ProjectionValue ? T
+  : B extends object
+    ? keyof B extends never ? T
+      : T extends readonly unknown[]
+        ? { [I in keyof T]: ProjectField<T[I], B> }
+        : T extends object ? ProjectFields<T, B> : T
+    : T;
+
+/**
+ * Static query result, including Nova's automatic root identifier.
+ * Declare link/reducer fields on the collection's result type for precise types;
+ * selected undeclared fields are unknown. Nested identifiers must be selected
+ * explicitly, since embedded objects and collection links share a body shape.
+ * Runtime body changes and aggregation pipelines cannot be inferred here.
+ */
+export type ProjectedResult<T, B> = T extends unknown
+  ? Simplify<Omit<ProjectFields<T, B>, "_id"> & RootIdentifier<T>>
+  : never;
+
+export declare function createQuery(name: string, func: () => void): IResolverQuery;
 
 declare module "meteor/mongo" {
   namespace Mongo {
@@ -131,8 +174,9 @@ declare module "meteor/mongo" {
           reduce: (object: U, params: AnyObject) => Promise<any>;
         }
       }): void;
-      createQuery(body: BodyT<U>, options?: AnyObject): IQuery<U>;
-      createQuery(name: string, body: BodyT<U>, options?: AnyObject): IQuery<U>;
+      createQuery(name: string, resolver: (params: AnyObject) => any, options?: AnyObject): IResolverQuery<U>;
+      createQuery<const B extends BodyT<U>>(body: B, options?: AnyObject): IQuery<U, ProjectedResult<U, B>>;
+      createQuery<const B extends BodyT<U>>(name: string, body: B, options?: AnyObject): IQuery<U, ProjectedResult<U, B>>;
       aggregate(pipeline: any[], options: AnyObject): Promise<any[]>; // TODO: Improve pipeline and return type
     }
   }
