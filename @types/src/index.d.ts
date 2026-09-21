@@ -40,13 +40,20 @@ export interface IQuery<T = any, R = T> {
   fetchAsync(context?: ContextType): Promise<R[]>;
   // Kept non-optional for compatibility; an empty query returns undefined at runtime.
   fetchOneAsync(context?: ContextType): Promise<R>;
+  getCountAsync(context?: ContextType): Promise<number>;
   invalidateQueries(params?: AnyObject): void;
   invalidateAllQueries(): void;
 }
 
-interface IResolverQuery<T = any> extends IQuery<T, any> {
-  clone(params?: AnyObject): IResolverQuery<T>;
-  fetchAsync(context?: ContextType): Promise<any>;
+export interface IResolverQuery<Params extends AnyObject = AnyObject, Result = any> {
+  name: string;
+  setParams(params?: Params): void;
+  resolve(resolver: (params: Params) => Result | Promise<Result>): void;
+  expose(params: ExposeParams): void;
+  clone(params?: Params): IResolverQuery<Params, Result>;
+  fetchAsync(context?: ContextType): Promise<Result>;
+  invalidateQueries(params?: Partial<Params>): void;
+  invalidateAllQueries(): void;
 }
 
 type $<T = any> = {
@@ -149,7 +156,16 @@ export type ProjectedResult<T, B> = T extends unknown
   ? Simplify<Omit<ProjectFields<T, B>, "_id"> & RootIdentifier<T>>
   : never;
 
-export declare function createQuery(name: string, func: () => void): IResolverQuery;
+export type InferQueryResult<Q> = Q extends IQuery<any, infer R>
+  ? R
+  : Q extends IResolverQuery<any, infer R>
+    ? R
+    : never;
+
+export declare function createQuery<Params extends AnyObject = AnyObject, Result = any>(
+  name: string,
+  resolver: (params: Params) => Result | Promise<Result>,
+): IResolverQuery<Params, Awaited<Result>>;
 
 declare module "meteor/mongo" {
   namespace Mongo {
@@ -161,6 +177,7 @@ declare module "meteor/mongo" {
           foreignField?: string;
           unique?: boolean;
           many?: boolean;
+          type?: "one" | "many";
           inversedBy?: string;
           index?: 1 | -1 | true;
           filters?: m.Mongo.Selector<T>;
@@ -174,7 +191,11 @@ declare module "meteor/mongo" {
           reduce: (object: U, params: AnyObject) => Promise<any>;
         }
       }): void;
-      createQuery(name: string, resolver: (params: AnyObject) => any, options?: AnyObject): IResolverQuery<U>;
+      createQuery<Params extends AnyObject = AnyObject, Result = any>(
+        name: string,
+        resolver: (params: Params) => Result | Promise<Result>,
+        options?: AnyObject,
+      ): IResolverQuery<Params, Awaited<Result>>;
       createQuery<const B extends BodyT<U>>(body: B, options?: AnyObject): IQuery<U, ProjectedResult<U, B>>;
       createQuery<const B extends BodyT<U>>(name: string, body: B, options?: AnyObject): IQuery<U, ProjectedResult<U, B>>;
       aggregate(pipeline: any[], options: AnyObject): Promise<any[]>; // TODO: Improve pipeline and return type

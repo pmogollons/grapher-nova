@@ -1,5 +1,5 @@
 import { Mongo } from "meteor/mongo";
-import { createQuery, type IQuery, type ProjectedResult } from "meteor/pmogollons:nova";
+import { createQuery, type InferQueryResult, type IQuery, type IResolverQuery, type ProjectedResult } from "meteor/pmogollons:nova";
 import type { IQuery as EntryQuery, ProjectedResult as EntryResult } from "../../@types/src/index";
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends
@@ -42,6 +42,7 @@ type AutomaticId = Assert<Equal<Result<typeof named>["_id"], string>>;
 type CloneResult = Assert<Equal<typeof named, ReturnType<typeof named.clone>>>;
 type FetchResult = Assert<Equal<ReturnType<typeof named.fetchAsync>, Promise<Result<typeof named>[]>>>;
 type FetchOneResult = Assert<Equal<ReturnType<typeof named.fetchOneAsync>, Promise<Result<typeof named>>>>;
+type CountResult = Assert<Equal<ReturnType<typeof named.getCountAsync>, Promise<number>>>;
 
 async function selectedAccess() {
   const user = await named.clone({ active: false }).fetchOneAsync({ userId: "viewer" });
@@ -117,6 +118,7 @@ users.addReducers({
     async reduce(user) { return user.displayName.length; },
   },
 });
+users.addLinks({ external: { collection: users, field: "_id", type: "one" } });
 
 const controlled = users.createQuery({
   username: true,
@@ -153,10 +155,15 @@ type ManualProfile = Assert<Equal<Manual["profile"], { firstName: string } | nul
 
 const resolver = createQuery("stats", async () => ({ count: 1 }));
 const collectionResolver = users.createQuery("stats", async (params) => ({ count: params.count }), { params: {} });
-type ResolverFetch = Assert<Equal<ReturnType<typeof resolver.fetchAsync>, Promise<any>>>;
-type CollectionResolverFetch = Assert<Equal<ReturnType<typeof collectionResolver.fetchAsync>, Promise<any>>>;
-type ResolverClone = Assert<Equal<ReturnType<ReturnType<typeof resolver.clone>["fetchAsync"]>, Promise<any>>>;
-type CollectionResolverClone = Assert<Equal<ReturnType<ReturnType<typeof collectionResolver.clone>["fetchAsync"]>, Promise<any>>>;
+type ResolverFetch = Assert<Equal<ReturnType<typeof resolver.fetchAsync>, Promise<{ count: number }>>>;
+type CollectionResolverFetch = Assert<Equal<ReturnType<typeof collectionResolver.fetchAsync>, Promise<{ count: any }>>>;
+type ResolverClone = Assert<Equal<ReturnType<ReturnType<typeof resolver.clone>["fetchAsync"]>, Promise<{ count: number }>>>;
+type CollectionResolverClone = Assert<Equal<ReturnType<ReturnType<typeof collectionResolver.clone>["fetchAsync"]>, Promise<{ count: any }>>>;
+type ResolverInference = Assert<Equal<InferQueryResult<typeof resolver>, { count: number }>>;
+declare const explicitResolver: IResolverQuery<{ condoId: string }, { total: number }>;
+explicitResolver.resolve(async ({ condoId }) => ({ total: condoId.length }));
+// @ts-expect-error Resolver parameters remain checked.
+explicitResolver.clone({ condoId: 1 });
 
 const untyped = new Mongo.Collection("dynamic").createQuery({
   title: true,
